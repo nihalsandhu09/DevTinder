@@ -1,0 +1,23 @@
+{
+  "name": "devtinder-backend",
+  "version": "1.0.0",
+  "description": "tinder for devs",
+  "keywords": [
+    "node",
+    "js",
+    "js",
+    "backend"
+  ],
+  "license": "ISC",
+  "author": "Nihal Sandhu",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
