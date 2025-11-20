@@ -91,3 +91,81 @@ app.get("/orders/:id", (req, res, next) => {
 app.use((err, req, res, next) => {
   res.status(500).send(err.message);
 });
+
+// login
+
+app.use(express.json());
+app.post("/login", (req, res, next) => {
+  if (req.body.username && req.body.password) {
+    res.send("Login succesfull");
+  } else {
+    next(new Error("Something is fishy "));
+  }
+});
+
+app.use((err, req, res, next) => {
+  res.status(500).send(err.message);
+});
+
+// Authentication  user
+
+app.use(express.json());
+
+//  user token logic
+const checkToken = (req, res, next) => {
+  const token = req.headers.token;
+
+  if (!token) {
+    return next(new Error("Token missing"));
+  }
+
+  const user = users.find((u) => u.token === token);
+
+  if (!user) {
+    return next(new Error("Invalid token"));
+  }
+
+  next();
+};
+
+// user profile
+app.get("/profile", checkToken, (req, res) => {
+  res.send("Welcome to your profile");
+});
+
+const users = [];
+
+// user register
+app.post("/signup", (req, res, next) => {
+  const { name, email, password } = req.body;
+
+  if (!name) return next(new Error("Name is required"));
+  if (!email) return next(new Error("Email is required"));
+  if (!password) return next(new Error("Password is required"));
+  users.push({ name, password, email });
+  res.send("User registered successfully");
+});
+
+//  user  login
+app.post("/login", (req, res, next) => {
+  const { email, password } = req.body;
+  if (!email) return next(new Error("Email is required"));
+  if (!password) return next(new Error("Password is required"));
+
+  const user = users.find((u) => u.email === email);
+  if (!user) {
+    return next(new Error("user not found"));
+  }
+
+  if (user.password !== password) {
+    return next(new Error("incorrect password"));
+  }
+
+  const token = Math.random().toString(36).substring(2);
+  user.token = token;
+  res.send({ message: "login succesfull", token: token });
+});
+
+app.use((err, req, res, next) => {
+  res.status(400).send(err.message);
+});
