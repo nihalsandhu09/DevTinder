@@ -6,16 +6,21 @@ const app = express();
 app.use(express.json());
 app.post("/signup", async (req, res) => {
   const userObj = {
-    firstName: "Nihal",
-    lastName: "Sandhu",
-    email: "nihalsandhu007220@gmail.com",
-    password: "nihal@1234",
+    firstName: "Sachin",
+    lastName: "Tendulkar",
+    email: "Sachin@gmail.com",
+    password: "Sachin@1234",
   };
-  //   Creating a new instance of User Model
-  const user = new User(userObj);
 
-  await user.save(); // return us the promise
-  res.send("user signed up");
+  try {
+    //   Creating a new instance of User Model
+    const user = new User(userObj);
+
+    await user.save(); // return us the promise
+    res.send("user signed up");
+  } catch (error) {
+    res.status(400).send("error saving the user", err);
+  }
 });
 
 connectDB()
