@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const validator = require("validator");
 const userSchema = new mongoose.Schema(
   {
     firstName: {
@@ -18,13 +18,24 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      immutable: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("invalid email adresss" + value);
+        }
+      },
     },
     password: {
       type: String,
       required: true,
-      lowercase: true,
+
       minLength: 6,
       select: false,
+      validate(value) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error("not Strong password " + value);
+        }
+      },
     },
     age: {
       type: Number,
@@ -40,6 +51,11 @@ const userSchema = new mongoose.Schema(
     },
     photoUrl: {
       type: String,
+      validate(value) {
+        if (value && !validator.isURL(value)) {
+          throw new Error("Invalid photo URL: " + value);
+        }
+      },
     },
     about: {
       type: String,
@@ -48,6 +64,11 @@ const userSchema = new mongoose.Schema(
     },
     skills: {
       type: [String],
+      validate(value) {
+        if (value.length >= 10) {
+          throw new Error("cannot add more then   10 skills  ");
+        }
+      },
     },
   },
   { timestamps: true }

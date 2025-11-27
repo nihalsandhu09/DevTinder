@@ -1,27 +1,32 @@
 const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/user");
-
+const validateSignUpData = require("./utilis/validation");
+const bcrypt = require("bcrypt");
 const app = express();
 
 app.use(express.json());
 
 //
 app.post("/signup", async (req, res) => {
-  const userObj = req.body;
-  // const { firstName, secondName, email, password, age, gender } = userObj;
-  // if (!firstName || !secondName || !email || !password || !age || !gender) {
-  //   res.send("something is missing ");
-  // }
-
   try {
+    console.log("Password received:", req.body.password);
+
+    // validate of data
+    validateSignUpData(req);
+    const userObj = req.body;
+    const { password } = req.body;
+    // Encrypt thee password
+    const passwordHash = await bcrypt.hash(password, 10);
+    userObj.password = passwordHash;
+
     //   Creating a new instance of User Model
     const user = new User(userObj);
 
     await user.save(); // return us the promise
     res.send("user signed up");
   } catch (error) {
-    res.status(400).send("error saving the user" + error.message);
+    res.status(400).send("error saving the user :" + error.message);
   }
 });
 
@@ -60,9 +65,9 @@ app.post("/login", async (req, res) => {
     if (!user) {
       return res.status(400).send("User is not Exist ");
     }
-    // if (password !== user.passWord) {
-    //   return res.status(400).send("Invalid password");
-    // }
+    if (password !== user.password) {
+      return res.status(400).send("Invalid password");
+    }
     res.send("Login succesfull");
   } catch (error) {
     res.status(500).send("Error during login: " + error.message);
@@ -99,10 +104,20 @@ app.delete("/user/:id", async (req, res) => {
     res.status(500).send("Error deleting user: " + err.message);
   }
 });
+
 app.patch("/user/:id", async (req, res) => {
   const { id } = req.params;
   const updateFields = req.body;
-
+  const Allowed_updates = ["photoUrl", "about", "gender", "age", "skills"];
+  const isupdateAllowed = Object.keys(updateFields).every((k) =>
+    Allowed_updates.includes(k)
+  );
+  if (!isupdateAllowed) {
+    return res.status(400).send("update not allowed");
+  }
+  if (updateFields.skills && updateFields.skills.length > 10) {
+    return res.status(400).send("cannot add more then 10 skills ");
+  }
   try {
     const updateUser = await User.findByIdAndUpdate(
       id,
