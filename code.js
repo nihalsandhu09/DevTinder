@@ -169,3 +169,78 @@ app.post("/login", (req, res, next) => {
 app.use((err, req, res, next) => {
   res.status(400).send(err.message);
 });
+
+app.get("/user/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(400).send("User not founds");
+    }
+    res.send(user);
+  } catch (err) {
+    res.status(500).send("Error deleting user: " + err.message);
+  }
+});
+
+app.delete("/user/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedUser = await User.findByIdAndDelete(id);
+
+    if (!deletedUser) {
+      return res.status(400).send("User not founds");
+    }
+
+    res.send("user deleted succesfully ");
+  } catch (err) {
+    res.status(500).send("Error deleting user: " + err.message);
+  }
+});
+
+app.patch("/user/:id", async (req, res) => {
+  const { id } = req.params;
+  const updateFields = req.body;
+  const Allowed_updates = ["photoUrl", "about", "gender", "age", "skills"];
+  const isupdateAllowed = Object.keys(updateFields).every((k) =>
+    Allowed_updates.includes(k)
+  );
+  if (!isupdateAllowed) {
+    return res.status(400).send("update not allowed");
+  }
+  if (updateFields.skills && updateFields.skills.length > 10) {
+    return res.status(400).send("cannot add more then 10 skills ");
+  }
+  try {
+    const updateUser = await User.findByIdAndUpdate(
+      id,
+      { $set: updateFields },
+      { new: true, runValidators: true }
+    );
+    res.send(updateUser);
+  } catch (err) {
+    res.status(500).send("Error updating user: " + err.message);
+  }
+});
+
+// update the user with emailid
+app.patch("/user", async (req, res) => {
+  const { email, ...updateFields } = req.body;
+
+  try {
+    const updateUser = await User.findOneAndUpdate(
+      { email: email },
+      { $set: updateFields },
+      { new: true }
+    );
+    if (!updateUser) {
+      return res.status(404).send("User not found");
+    }
+    res.send(updateUser);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
