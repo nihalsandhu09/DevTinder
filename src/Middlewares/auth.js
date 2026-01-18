@@ -14,7 +14,7 @@ const auth = async (req, res, next) => {
     // validate the token
     const decodedMessage = await jwt.verify(token, "DEV@Tinder$790");
     const { _id } = decodedMessage;
-    const user = await User.findById(_id).select("+password");
+    const user = await User.findById(_id);
     if (!user) {
       throw new Error("user not found ");
     }
