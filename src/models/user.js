@@ -50,11 +50,11 @@ const userSchema = new mongoose.Schema(
         values: ["male", "female", "other"],
         message: `{VALUE} is missing `,
       },
-      validate(value) {
-        if (!["male", "female", "others"].includes(value)) {
-          throw new Error("gender data is not valid ");
-        }
-      },
+      // validate(value) {
+      //   if (!["male", "female", "others"].includes(value)) {
+      //     throw new Error("gender data is not valid ");
+      //   }
+      // },
     },
     photoUrl: {
       type: String,
@@ -71,6 +71,7 @@ const userSchema = new mongoose.Schema(
     },
     skills: {
       type: [String],
+      default: [],
       validate(value) {
         if (value.length >= 10) {
           throw new Error("cannot add more then   10 skills  ");
@@ -78,7 +79,7 @@ const userSchema = new mongoose.Schema(
       },
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 userSchema.methods.getJWT = async function () {
@@ -94,7 +95,7 @@ userSchema.methods.validatePassword = async function (passwordInputByUser) {
   const passwordHash = user.password;
   const isPAsswordValid = await bcrypt.compare(
     passwordInputByUser,
-    passwordHash
+    passwordHash,
   );
   return isPAsswordValid;
 };

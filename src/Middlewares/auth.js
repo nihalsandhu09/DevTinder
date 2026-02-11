@@ -9,7 +9,7 @@ const auth = async (req, res, next) => {
 
     const { token } = cookies;
     if (!token) {
-      return res.status(401).send("Access denied: No token provided");
+      return res.status(401).send("Access denied: unauthorized Login ");
     }
     // validate the token
     const decodedMessage = await jwt.verify(token, "DEV@Tinder$790");
@@ -21,7 +21,7 @@ const auth = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    return res.status(400).send("Error " + error.message);
+    return res.status(401).send("Unauthorized: " + error.message);
   }
 };
 

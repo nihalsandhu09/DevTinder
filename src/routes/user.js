@@ -33,8 +33,8 @@ userRouter.get("/user/connections", auth, async (req, res) => {
       status: "accepted",
       $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
     })
-      .populate("fromUserId", "firstName lastName photoUrl age ")
-      .populate("toUserId", "firstName lastName photoUrl age");
+      .populate("fromUserId", "firstName lastName photoUrl age about gender")
+      .populate("toUserId", "firstName lastName photoUrl age about gender");
 
     const data = connectionRequest.map((row) => {
       if (row.fromUserId._id.toString() === loggedInUser._id.toString()) {
@@ -89,7 +89,7 @@ userRouter.get("/user/feed", auth, async (req, res) => {
         $nin: Array.from(excludedUserIds),
       },
     })
-      .select("firstName lastName")
+      .select("firstName lastName age gender photoUrl about skills ")
       .skip(skip)
       .limit(limit);
 

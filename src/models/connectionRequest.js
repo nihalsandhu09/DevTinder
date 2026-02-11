@@ -23,7 +23,7 @@ const connectionRequestSchema = mongoose.Schema(
   },
   {
     timestaps: true,
-  }
+  },
 );
 connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 });
 
@@ -37,7 +37,7 @@ connectionRequestSchema.pre("save", function (next) {
 
 const ConnectionRequestModel = new mongoose.model(
   "ConnectionRequest",
-  connectionRequestSchema
+  connectionRequestSchema,
 );
 
 module.exports = ConnectionRequestModel;
